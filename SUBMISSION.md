@@ -1,32 +1,32 @@
-# Submission Summary (PyTorch-Only, `dl` Environment)
+# Submission Summary (v2.0.0)
+
+## Canonical Repository
+
+- [bozliu/PostureMirror](https://github.com/bozliu/PostureMirror)
+- Previous repo URL (`dynamic-sitting-posture-recognition`) is expected to redirect.
 
 ## Scope Delivered
 
 - PyTorch-only posture recognition pipeline.
-- Realtime webcam mode with stability improvements.
-- Upper-body-only posture inference mode for practical webcam framing.
-- Optional PyTorch OpenPose backend (`openpose_torch`) with automatic fallback.
-- Strong red/green feedback visualization.
+- Upper-body-first posture decision path for realistic laptop webcam framing.
+- Stable realtime webcam runtime with latest-frame-first processing.
+- Optional `openpose_torch` backend with fallback to realtime backend.
+- Desktop distribution for Apple Silicon:
+  - `PostureMirror.app`
+  - `PostureMirror-v2.0.0-macos-arm64.dmg`
 
-## Why Upper-Body-Only Matters
+## Why Upper-Body-Only Is Important
 
-In normal laptop camera placement, lower body is often not visible.
-This submission makes posture classification dependable in that real-world condition by using upper-body keypoint geometry as the primary signal.
+In practical office usage, webcams usually miss legs. Full-body-only logic becomes unreliable. This release defaults to `upper_body` mode and classifies posture from head/shoulder/torso/hand geometry, so feedback remains usable in real deployment.
 
-## What Was Implemented
+## Contract Compatibility
 
-- `pose_mode=upper_body` default for webcam.
-- Upper-body decision features and rule path.
-- `kneeling` contract preserved for compatibility:
-  - upper-body mode emits `kneeling=false` and warning.
-- Latest-frame-first async loop.
-- Runtime camera reconnect logic.
-- macOS-friendly close behavior (`X`, `q`, `Esc`).
+No JSON schema break for inference output fields. Existing keys remain available.
 
 ## Reproducibility Commands
 
 ```bash
-conda env create -f environment.yml
+conda env update -n dl -f environment.dl.yml --prune
 conda activate dl
 pip install -e '.[dev]'
 conda run -n dl pytest -q
@@ -38,30 +38,29 @@ conda run -n dl posture-recognition webcam \
   --pose-mode upper_body \
   --display-backend tk \
   --camera-id 0 \
+  --capture-width 960 \
+  --capture-height 540 \
   --infer-max-dim 512 \
   --infer-every-n 2
 ```
 
-## Privacy/Security Cleanup
+## DMG Build / Release Artifacts
 
-- Removed personal identifier fields from project metadata.
-- Removed non-essential personal references from docs, keeping only the explicitly requested published Medium article link.
-- Added ignore rules for `.env`, logs, outputs, caches, and local data folders.
-- Added `.env.example` with placeholder only.
+```bash
+bash scripts/build_macos_app.sh
+bash scripts/build_dmg.sh v2.0.0
+```
 
-## Acceptance Snapshot
-
-- Tests pass in `dl` environment.
-- Image demo, benchmark, and webcam command paths are documented and runnable.
-
+Expected files:
+- `dist/PostureMirror-v2.0.0-macos-arm64.dmg`
+- `dist/PostureMirror-v2.0.0-macos-arm64.dmg.sha256`
 
 ## Published Article
 
-- https://bozliu.medium.com/dynamic-siting-posture-recognition-and-correction-68ae418fbc77
-
+- [Dynamic Siting Posture Recognition and Correction](https://bozliu.medium.com/dynamic-siting-posture-recognition-and-correction-68ae418fbc77)
 
 ## License and Commercial Rights
 
-- Repository license: PolyForm Noncommercial 1.0.0 (`LICENSE`).
-- Commercial rights are reserved by the project owner.
-- Commercial usage requires a separate written commercial license; request via GitHub issue (`Commercial License Request`).
+- License: PolyForm Noncommercial 1.0.0 (`LICENSE`).
+- Commercial rights reserved by project owner.
+- Commercial usage requires separate written license (`COMMERCIAL-LICENSE.md`).

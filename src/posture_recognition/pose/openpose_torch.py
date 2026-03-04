@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -21,6 +22,8 @@ class OpenPoseTorchBackendConfig:
     device: str = "auto"
     max_image_dim: int = 512
     model_name: str = "openpose_mobilenetv2"
+    repo_or_dir: str | None = None
+    checkpoint_path: str | None = None
 
 
 class OpenPoseTorchBackend:
@@ -61,17 +64,30 @@ class OpenPoseTorchBackend:
     def _load_model(self) -> None:
         if self.model is not None:
             return
+        repo_or_dir = self.config.repo_or_dir or "Daniil-Osokin/lightweight-human-pose-estimation.pytorch"
+        source = "local" if self.config.repo_or_dir and Path(self.config.repo_or_dir).exists() else "github"
         try:
             self.model = torch.hub.load(
-                "Daniil-Osokin/lightweight-human-pose-estimation.pytorch",
+                repo_or_dir,
                 self.config.model_name,
                 pretrained=True,
                 trust_repo=True,
+                source=source,
             )
             if hasattr(self.model, "to"):
                 self.model = self.model.to(self.device)
             if hasattr(self.model, "eval"):
                 self.model.eval()
+
+            checkpoint_path = Path(self.config.checkpoint_path) if self.config.checkpoint_path else None
+            if checkpoint_path is not None:
+                if checkpoint_path.exists() and hasattr(self.model, "load_state_dict"):
+                    state_dict = torch.load(str(checkpoint_path), map_location="cpu")
+                    if isinstance(state_dict, dict) and "state_dict" in state_dict:
+                        state_dict = state_dict["state_dict"]
+                    self.model.load_state_dict(state_dict, strict=False)
+                else:
+                    self.warnings.append(f"Configured openpose checkpoint_path not found: {checkpoint_path}")
         except Exception as exc:  # pragma: no cover - depends on internet/runtime
             raise RuntimeError(f"Failed to load PyTorch OpenPose model: {exc}") from exc
 

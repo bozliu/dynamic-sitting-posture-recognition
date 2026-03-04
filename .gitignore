@@ -28,6 +28,9 @@ docs/_generated/
 
 # Packaging
 *.egg-info/
+build/
+dist/
+packaging/models/
 
 # Virtualenvs
 .venv/

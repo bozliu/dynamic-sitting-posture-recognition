@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -43,6 +45,22 @@ class PosturePipeline:
         inference_cfg = self.config["inference"]
         realtime_cfg = inference_cfg.get("realtime", {})
         openpose_cfg = inference_cfg.get("openpose_torch", {})
+        realtime_model_path = self._resolve_model_path(
+            realtime_cfg.get("model_path"),
+            "realtime/yolo11n-pose.pt",
+        )
+        accurate_weights_path = self._resolve_model_path(
+            inference_cfg.get("weights_path"),
+            "accurate/keypointrcnn_resnet50_fpn_coco.pth",
+        )
+        openpose_repo_or_dir = self._resolve_model_path(
+            openpose_cfg.get("repo_or_dir"),
+            "openpose_torch/lightweight-human-pose-estimation.pytorch",
+        )
+        openpose_checkpoint_path = self._resolve_model_path(
+            openpose_cfg.get("checkpoint_path"),
+            "openpose_torch/openpose_mobilenetv2.pth",
+        )
         selected_backend = str(backend or inference_cfg.get("backend", "realtime")).lower().strip()
         selected_device = device if device != "auto" else str(inference_cfg.get("device", "auto"))
         person_score_threshold = float(inference_cfg["person_score_threshold"])
@@ -69,6 +87,7 @@ class PosturePipeline:
                     device=selected_device,
                     max_image_dim=realtime_max_dim,
                     model_name=str(realtime_cfg.get("model_name", "yolo11n-pose.pt")),
+                    model_path=realtime_model_path,
                 )
             except Exception as exc:
                 self.startup_warnings.append(
@@ -81,6 +100,7 @@ class PosturePipeline:
                     keypoint_score_threshold=keypoint_score_threshold,
                     device=selected_device,
                     max_image_dim=accurate_max_dim,
+                    weights_path=accurate_weights_path,
                 )
         elif selected_backend == "openpose_torch":
             openpose_max_dim = int(infer_max_dim or openpose_cfg.get("max_dim", 512))
@@ -91,6 +111,8 @@ class PosturePipeline:
                     device=selected_device,
                     max_image_dim=openpose_max_dim,
                     model_name=str(openpose_cfg.get("model_name", "openpose_mobilenetv2")),
+                    repo_or_dir=openpose_repo_or_dir,
+                    checkpoint_path=openpose_checkpoint_path,
                 )
             except Exception as exc:
                 self.startup_warnings.append(
@@ -104,6 +126,7 @@ class PosturePipeline:
                     device=selected_device,
                     max_image_dim=realtime_max_dim,
                     model_name=str(realtime_cfg.get("model_name", "yolo11n-pose.pt")),
+                    model_path=realtime_model_path,
                 )
         elif selected_backend == "accurate":
             accurate_max_dim = int(infer_max_dim or inference_cfg.get("max_image_dim", 960))
@@ -112,6 +135,7 @@ class PosturePipeline:
                 keypoint_score_threshold=keypoint_score_threshold,
                 device=selected_device,
                 max_image_dim=accurate_max_dim,
+                weights_path=accurate_weights_path,
             )
         else:
             self.startup_warnings.append(
@@ -125,6 +149,7 @@ class PosturePipeline:
                 device=selected_device,
                 max_image_dim=realtime_max_dim,
                 model_name=str(realtime_cfg.get("model_name", "yolo11n-pose.pt")),
+                model_path=realtime_model_path,
             )
 
         self.keypoint_threshold = keypoint_score_threshold
@@ -136,12 +161,14 @@ class PosturePipeline:
         keypoint_score_threshold: float,
         device: str,
         max_image_dim: int,
+        weights_path: str | None,
     ) -> TorchvisionPoseBackend:
         pose_cfg = PoseBackendConfig(
             person_score_threshold=person_score_threshold,
             keypoint_score_threshold=keypoint_score_threshold,
             device=device,
             max_image_dim=max_image_dim,
+            weights_path=weights_path,
         )
         return TorchvisionPoseBackend(pose_cfg)
 
@@ -152,6 +179,7 @@ class PosturePipeline:
         device: str,
         max_image_dim: int,
         model_name: str,
+        model_path: str | None,
     ):
         from posture_recognition.pose.ultralytics_pose import (
             UltralyticsPoseBackend,
@@ -163,6 +191,7 @@ class PosturePipeline:
             keypoint_score_threshold=keypoint_score_threshold,
             device=device,
             model_name=model_name,
+            model_path=model_path,
             max_image_dim=max_image_dim,
         )
         return UltralyticsPoseBackend(pose_cfg)
@@ -174,6 +203,8 @@ class PosturePipeline:
         device: str,
         max_image_dim: int,
         model_name: str,
+        repo_or_dir: str | None,
+        checkpoint_path: str | None,
     ):
         from posture_recognition.pose.openpose_torch import (
             OpenPoseTorchBackend,
@@ -185,6 +216,8 @@ class PosturePipeline:
             keypoint_score_threshold=keypoint_score_threshold,
             device=device,
             model_name=model_name,
+            repo_or_dir=repo_or_dir,
+            checkpoint_path=checkpoint_path,
             max_image_dim=max_image_dim,
         )
         return OpenPoseTorchBackend(pose_cfg)
@@ -200,6 +233,31 @@ class PosturePipeline:
             config = _deep_merge(config, calibration)
 
         return config
+
+    @staticmethod
+    def _resolve_model_path(configured_path: str | None, bundled_subpath: str) -> str | None:
+        if configured_path:
+            return configured_path
+
+        candidate_roots: list[Path] = []
+        env_models_dir = os.environ.get("POSTUREMIRROR_MODELS_DIR")
+        if env_models_dir:
+            candidate_roots.append(Path(env_models_dir))
+
+        if getattr(sys, "frozen", False):
+            meipass = Path(str(getattr(sys, "_MEIPASS", "")))
+            if meipass:
+                candidate_roots.extend([meipass / "models", meipass])
+
+        repo_root = Path(__file__).resolve().parents[2]
+        candidate_roots.extend([repo_root / "packaging" / "models", repo_root / "models"])
+
+        for root in candidate_roots:
+            candidate = root / bundled_subpath
+            if candidate.exists():
+                return str(candidate)
+
+        return None
 
     def predict(
         self,

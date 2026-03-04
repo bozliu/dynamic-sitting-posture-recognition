@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -17,6 +18,7 @@ class PoseBackendConfig:
     keypoint_score_threshold: float = 0.3
     device: str = "auto"
     max_image_dim: int = 960
+    weights_path: str | None = None
 
 
 class TorchvisionPoseBackend:
@@ -43,8 +45,16 @@ class TorchvisionPoseBackend:
     def _load_model(self) -> None:
         if self.model is not None:
             return
-        weights = torchvision.models.detection.KeypointRCNN_ResNet50_FPN_Weights.DEFAULT
-        model = torchvision.models.detection.keypointrcnn_resnet50_fpn(weights=weights)
+        weights_path = Path(self.config.weights_path) if self.config.weights_path else None
+        if weights_path is not None and weights_path.exists():
+            model = torchvision.models.detection.keypointrcnn_resnet50_fpn(weights=None)
+            state_dict = torch.load(str(weights_path), map_location="cpu")
+            model.load_state_dict(state_dict)
+        else:
+            if weights_path is not None and not weights_path.exists():
+                self.warnings.append(f"Configured accurate weights_path not found: {weights_path}")
+            weights = torchvision.models.detection.KeypointRCNN_ResNet50_FPN_Weights.DEFAULT
+            model = torchvision.models.detection.keypointrcnn_resnet50_fpn(weights=weights)
         model.eval()
         self.model = model.to(self.device)
 

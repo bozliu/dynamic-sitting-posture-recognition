@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -16,6 +17,7 @@ class UltralyticsPoseBackendConfig:
     keypoint_score_threshold: float = 0.25
     device: str = "auto"
     model_name: str = "yolo11n-pose.pt"
+    model_path: str | None = None
     max_image_dim: int = 640
 
 
@@ -47,7 +49,12 @@ class UltralyticsPoseBackend:
                 "or use `--backend accurate`."
             ) from exc
 
-        self.model = YOLO(self.config.model_name)
+        source = self.config.model_path or self.config.model_name
+        if self.config.model_path and not Path(self.config.model_path).exists():
+            self.warnings.append(f"Configured realtime model_path not found: {self.config.model_path}")
+            source = self.config.model_name
+
+        self.model = YOLO(str(source))
 
     @staticmethod
     def _normalize_keypoints(

@@ -5,12 +5,16 @@ inference:
   person_score_threshold: 0.55
   keypoint_score_threshold: 0.30
   max_image_dim: 960
+  weights_path: null
   realtime:
     model_name: yolo11n-pose.pt
+    model_path: null
     max_dim: 512
     infer_every_n: 2
   openpose_torch:
     model_name: openpose_mobilenetv2
+    repo_or_dir: null
+    checkpoint_path: null
     max_dim: 512
   camera:
     backend: avfoundation
@@ -19,7 +23,7 @@ inference:
     read_fail_max: 120
 
 ui:
-  display_backend: auto
+  display_backend: tk
   font_scale_base: 1.0
   alert_blink: true
 

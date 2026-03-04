@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install test image-demo evaluate calibrate benchmark format
+.PHONY: install test image-demo evaluate calibrate benchmark prefetch-models build-macos-app build-dmg
 
 install:
 	$(PYTHON) -m pip install -U pip
@@ -23,3 +23,12 @@ calibrate:
 
 benchmark:
 	posture-recognition benchmark --images-dir sample_images --num-frames 300 --report artifacts/benchmark.json
+
+prefetch-models:
+	python scripts/prefetch_models.py --output-dir packaging/models
+
+build-macos-app:
+	bash scripts/build_macos_app.sh
+
+build-dmg:
+	bash scripts/build_dmg.sh v2.0.0
