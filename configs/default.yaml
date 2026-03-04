@@ -1,0 +1,35 @@
+inference:
+  backend: realtime
+  pose_mode: upper_body
+  device: auto
+  person_score_threshold: 0.55
+  keypoint_score_threshold: 0.30
+  max_image_dim: 960
+  realtime:
+    model_name: yolo11n-pose.pt
+    max_dim: 512
+    infer_every_n: 2
+  openpose_torch:
+    model_name: openpose_mobilenetv2
+    max_dim: 512
+  camera:
+    backend: avfoundation
+    open_timeout_sec: 2.0
+    first_frame_timeout_sec: 2.0
+    read_fail_max: 120
+
+ui:
+  display_backend: auto
+  font_scale_base: 1.0
+  alert_blink: true
+
+rules:
+  hunch_forward_min: 0.18
+  recline_forward_min: 0.18
+  straight_forward_max: 0.12
+  straight_tilt_max_deg: 18.0
+  kneeling_knee_angle_max_deg: 115.0
+  kneeling_hip_ankle_max_norm: 0.90
+  hands_wrist_distance_max_norm: 0.55
+  hands_wrist_to_torso_max_norm: 1.10
+  min_keypoint_confidence: 0.25

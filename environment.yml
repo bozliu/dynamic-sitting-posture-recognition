@@ -1,0 +1,25 @@
+name: dl
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy=1.26.4
+  - jpeg=9e
+  - scipy=1.13.1
+  - pandas=2.2.3
+  - pyyaml=6.0.2
+  - pytest=8.3.4
+  - pip
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - torchaudio=2.5.1
+  - pip:
+      - opencv-python==4.10.0.84
+      - click==8.1.7
+      - typer==0.12.5
+      - rich==13.9.4
+      - tqdm==4.67.1
+      - pillow==10.4.0
+      - ultralytics==8.4.19

@@ -1,0 +1,10 @@
+rules:
+  hunch_forward_min: 0.18
+  recline_forward_min: 0.18
+  straight_forward_max: 0.18
+  straight_tilt_max_deg: 16.0
+  kneeling_knee_angle_max_deg: 115.0
+  kneeling_hip_ankle_max_norm: 0.9
+  hands_wrist_distance_max_norm: 0.55
+  hands_wrist_to_torso_max_norm: 1.1
+  min_keypoint_confidence: 0.25

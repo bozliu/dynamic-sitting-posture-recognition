@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.ipynb_checkpoints/
+
+# Test/build cache
+.pytest_cache/
+.mypy_cache/
+
+# Local artifacts / outputs
+artifacts/
+tmp/
+output/
+outputs/
+data/
+docs/_generated/
+*.log
+
+# Desktop environment artifacts
+.directory
+
+# Packaging
+*.egg-info/
+
+# Virtualenvs
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Model checkpoints
+*.pt
