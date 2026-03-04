@@ -1,4 +1,4 @@
-# Submission Summary (v2.0.0)
+# Submission Summary (v2.0.1)
 
 ## Canonical Repository
 
@@ -13,7 +13,7 @@
 - Optional `openpose_torch` backend with fallback to realtime backend.
 - Desktop distribution for Apple Silicon:
   - `PostureMirror.app`
-  - `PostureMirror-v2.0.0-macos-arm64.dmg`
+  - `PostureMirror-v2.0.1-macos-arm64.dmg`
 
 ## Why Upper-Body-Only Is Important
 
@@ -48,12 +48,12 @@ conda run -n dl posture-recognition webcam \
 
 ```bash
 bash scripts/build_macos_app.sh
-bash scripts/build_dmg.sh v2.0.0
+bash scripts/build_dmg.sh v2.0.1
 ```
 
 Expected files:
-- `dist/PostureMirror-v2.0.0-macos-arm64.dmg`
-- `dist/PostureMirror-v2.0.0-macos-arm64.dmg.sha256`
+- `dist/PostureMirror-v2.0.1-macos-arm64.dmg`
+- `dist/PostureMirror-v2.0.1-macos-arm64.dmg.sha256`
 
 ## Published Article
 

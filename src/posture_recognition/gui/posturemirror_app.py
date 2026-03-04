@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import threading
 from pathlib import Path
 from typing import Optional
@@ -11,10 +12,45 @@ from posture_recognition.pipeline import PosturePipeline
 from posture_recognition.runtime.webcam_runtime import WebcamRuntimeController, WebcamRuntimeOptions
 
 
+def _resolve_resource_path(relative_path: str) -> Path:
+    candidate = Path(relative_path)
+    if candidate.exists():
+        return candidate
+
+    search_roots: list[Path] = []
+
+    if getattr(sys, "frozen", False):
+        meipass = Path(str(getattr(sys, "_MEIPASS", "")))
+        if meipass:
+            search_roots.extend([meipass, meipass / "Resources", meipass.parent / "Resources"])
+
+        executable = Path(str(getattr(sys, "executable", "")))
+        if executable:
+            macos_dir = executable.parent
+            contents_dir = macos_dir.parent
+            search_roots.extend([macos_dir, contents_dir, contents_dir / "Resources"])
+
+    for root in search_roots:
+        bundled = root / relative_path
+        if bundled.exists():
+            return bundled
+
+    repo_root = Path(__file__).resolve().parents[3]
+    repo_candidate = repo_root / relative_path
+    if repo_candidate.exists():
+        return repo_candidate
+
+    # Let caller surface a clean error message with attempted path.
+    return candidate
+
+
 def _build_pipeline(args: argparse.Namespace) -> PosturePipeline:
+    config_path = _resolve_resource_path(args.config)
+    calibration_path = _resolve_resource_path(args.calibration)
+
     return PosturePipeline(
-        config_path=Path(args.config),
-        calibration_path=Path(args.calibration),
+        config_path=config_path,
+        calibration_path=calibration_path,
         device=args.device,
         backend=args.backend,
         pose_mode=args.pose_mode,

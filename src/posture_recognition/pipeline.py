@@ -247,7 +247,19 @@ class PosturePipeline:
         if getattr(sys, "frozen", False):
             meipass = Path(str(getattr(sys, "_MEIPASS", "")))
             if meipass:
-                candidate_roots.extend([meipass / "models", meipass])
+                candidate_roots.extend([meipass / "models", meipass, meipass / "Resources" / "models"])
+
+            executable = Path(str(getattr(sys, "executable", "")))
+            if executable:
+                macos_dir = executable.parent
+                contents_dir = macos_dir.parent
+                candidate_roots.extend(
+                    [
+                        contents_dir / "Resources" / "models",
+                        contents_dir / "Resources",
+                        macos_dir / "models",
+                    ]
+                )
 
         repo_root = Path(__file__).resolve().parents[2]
         candidate_roots.extend([repo_root / "packaging" / "models", repo_root / "models"])

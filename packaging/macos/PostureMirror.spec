@@ -17,6 +17,7 @@ datas = []
 datas += collect_data_files("posture_recognition")
 if models_dir.exists():
     datas.append((str(models_dir), "models"))
+datas.append((str(project_root / "configs"), "configs"))
 
 block_cipher = None
 
@@ -69,4 +70,10 @@ app = BUNDLE(
     name="PostureMirror.app",
     icon=None,
     bundle_identifier="com.bozliu.posturemirror",
+    version="2.0.1",
+    info_plist={
+        "CFBundleShortVersionString": "2.0.1",
+        "CFBundleVersion": "2.0.1",
+        "NSCameraUsageDescription": "PostureMirror uses the camera to provide real-time posture feedback.",
+    },
 )

@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-VERSION="${1:-v2.0.0}"
+VERSION="${1:-v2.0.1}"
 VERSION="${VERSION#v}"
 APP_PATH="$ROOT_DIR/dist/PostureMirror.app"
 

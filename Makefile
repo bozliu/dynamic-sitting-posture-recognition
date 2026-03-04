@@ -31,4 +31,4 @@ build-macos-app:
 	bash scripts/build_macos_app.sh
 
 build-dmg:
-	bash scripts/build_dmg.sh v2.0.0
+	bash scripts/build_dmg.sh v2.0.1
