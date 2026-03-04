@@ -5,6 +5,11 @@ Previous URL (`dynamic-sitting-posture-recognition`) is kept by GitHub redirect.
 
 This project delivers a practical posture-feedback system inspired by the Alexander Technique, focused on real office webcam conditions.
 
+## Download DMG (Apple Silicon)
+
+- [Download PostureMirror v2.0.0 DMG](https://github.com/bozliu/PostureMirror/releases/download/v2.0.0/PostureMirror-v2.0.0-macos-arm64.dmg)
+- [SHA256 Checksum](https://github.com/bozliu/PostureMirror/releases/download/v2.0.0/PostureMirror-v2.0.0-macos-arm64.dmg.sha256)
+
 ## Published Article
 
 This codebase is the PyTorch rebuild and engineering release of:  
