@@ -1,6 +1,8 @@
 PYTHON ?= python
+SOURCE_APP ?= /Volumes/PostureMirror/PostureMirror.app
+APPS_DIR ?= /Applications
 
-.PHONY: install test image-demo evaluate calibrate benchmark prefetch-models build-macos-app build-dmg
+.PHONY: install test image-demo evaluate calibrate benchmark prefetch-models build-macos-app build-dmg install-app uninstall-app cleanup-app-residuals
 
 install:
 	$(PYTHON) -m pip install -U pip
@@ -31,4 +33,13 @@ build-macos-app:
 	bash scripts/build_macos_app.sh
 
 build-dmg:
-	bash scripts/build_dmg.sh v2.0.1
+	bash scripts/build_dmg.sh v2.0.2
+
+install-app:
+	bash scripts/install_macos_app.sh --source-app "$(SOURCE_APP)" --apps-dir "$(APPS_DIR)"
+
+uninstall-app:
+	bash scripts/uninstall_macos_app.sh --apps-dir "$(APPS_DIR)"
+
+cleanup-app-residuals:
+	bash scripts/cleanup_app_residuals.sh --apps-dir "$(APPS_DIR)"

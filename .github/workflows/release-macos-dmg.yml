@@ -33,7 +33,7 @@ jobs:
 
       - name: Build DMG and checksum
         run: |
-          VERSION="${GITHUB_REF_NAME:-v2.0.1}"
+          VERSION="${GITHUB_REF_NAME:-v2.0.2}"
           bash scripts/build_dmg.sh "$VERSION"
 
       - name: Upload assets to GitHub Release

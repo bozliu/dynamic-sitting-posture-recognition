@@ -7,8 +7,8 @@ This project delivers a practical posture-feedback system inspired by the Alexan
 
 ## Download DMG (Apple Silicon)
 
-- [Download PostureMirror v2.0.1 DMG](https://github.com/bozliu/PostureMirror/releases/download/v2.0.1/PostureMirror-v2.0.1-macos-arm64.dmg)
-- [SHA256 Checksum](https://github.com/bozliu/PostureMirror/releases/download/v2.0.1/PostureMirror-v2.0.1-macos-arm64.dmg.sha256)
+- [Download PostureMirror v2.0.2 DMG](https://github.com/bozliu/PostureMirror/releases/download/v2.0.2/PostureMirror-v2.0.2-macos-arm64.dmg)
+- [SHA256 Checksum](https://github.com/bozliu/PostureMirror/releases/download/v2.0.2/PostureMirror-v2.0.2-macos-arm64.dmg.sha256)
 
 ## Published Article
 
@@ -19,7 +19,7 @@ This codebase is the PyTorch rebuild and engineering release of:
 
 Lower-back pain is common in office workers, but many posture systems assume full-body visibility. In real laptop usage, webcams often capture only the upper body.
 
-## What We Improved (v2.0.1)
+## What We Improved (v2.0.2)
 
 - Added **upper-body-first posture inference** (`pose_mode=upper_body`) for realistic webcam framing.
 - Kept strong real-time feedback policy:
@@ -27,7 +27,7 @@ Lower-back pain is common in office workers, but many posture systems assume ful
   - all other posture labels -> red
 - Added **desktop app distribution** for Apple Silicon:
   - `PostureMirror.app`
-  - `PostureMirror-v2.0.1-macos-arm64.dmg`
+  - `PostureMirror-v2.0.2-macos-arm64.dmg`
 - Preserved full CLI toolkit for image/video/evaluate/benchmark.
 - Kept PyTorch-only stack with optional `openpose_torch` backend.
 
@@ -98,12 +98,12 @@ Close with window `X`, `Esc`, or `q`.
 ### Download DMG
 
 - Release page: [PostureMirror Releases](https://github.com/bozliu/PostureMirror/releases)
-- Artifact name: `PostureMirror-v2.0.1-macos-arm64.dmg`
-- Checksum file: `PostureMirror-v2.0.1-macos-arm64.dmg.sha256`
+- Artifact name: `PostureMirror-v2.0.2-macos-arm64.dmg`
+- Checksum file: `PostureMirror-v2.0.2-macos-arm64.dmg.sha256`
 
 ### Unsigned App First Launch
 
-v2.0.1 is an unsigned public beta.
+v2.0.2 is an unsigned public beta.
 
 - Open the DMG and drag `PostureMirror.app` into `Applications`.
 - First launch may be blocked by Gatekeeper.
@@ -139,7 +139,24 @@ If OpenPose backend fails to initialize, runtime falls back to realtime backend 
 
 ```bash
 bash scripts/build_macos_app.sh
-bash scripts/build_dmg.sh v2.0.1
+bash scripts/build_dmg.sh v2.0.2
+```
+
+
+## Zero-Residual Install Policy (macOS)
+
+Do not update app manually with backup-style commands (for example `mv PostureMirror.app PostureMirror.app.bak.*`).
+Use the official scripts below to guarantee that `/Applications` only keeps `PostureMirror.app`.
+
+```bash
+# Install or update (no .bak folder left in /Applications)
+bash scripts/install_macos_app.sh --source-app /Volumes/PostureMirror/PostureMirror.app
+
+# One-time cleanup for old residual folders
+bash scripts/cleanup_app_residuals.sh
+
+# Uninstall app (+ residual folders). Add --purge-user-data if needed
+bash scripts/uninstall_macos_app.sh
 ```
 
 ## Output Contract (no schema break)

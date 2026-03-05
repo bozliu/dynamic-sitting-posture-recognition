@@ -70,10 +70,10 @@ app = BUNDLE(
     name="PostureMirror.app",
     icon=None,
     bundle_identifier="com.bozliu.posturemirror",
-    version="2.0.1",
+    version="2.0.2",
     info_plist={
-        "CFBundleShortVersionString": "2.0.1",
-        "CFBundleVersion": "2.0.1",
+        "CFBundleShortVersionString": "2.0.2",
+        "CFBundleVersion": "2.0.2",
         "NSCameraUsageDescription": "PostureMirror uses the camera to provide real-time posture feedback.",
     },
 )
